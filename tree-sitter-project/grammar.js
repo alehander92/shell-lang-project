@@ -4,7 +4,12 @@ module.exports = grammar({
     rules: {
       // TODO: add the actual grammar rules
       source_file: $ => $._expression, // repeat($._fieldExpression)),
-      _expression: $ => choice($.fieldCall, $.fieldName, $.name, $.integer), //choice($.name),
+      _expression: $ => choice(
+        $.fieldCall,
+        $.fieldName,
+        $.index,
+        $.name,
+        $.integer),
       // fieldExpression: $ => seq($._expression, choice($.fieldCall, $.fieldName)),
       fieldCall: $ => seq($._expression, ':', $.name, '(', $._expression, ')'),
       fieldName: $ => seq(':', $.name),

@@ -91,6 +91,30 @@ cargo build
 target/debug/<project-name>
 ```
 
+eventually ideas:
+
+```
+<user> <pwd>> dir[0]
+a.rs
+> a.rs 
+<File a.rs>
+> cd other
+<moved to other>
+%firefox
+<Process firefox #824>
+%%firefox
+[<Process firefox #824>, <..>]
+%firefox:cpu
+`<escape command>`
+// interpreter as a RawOutput
+// having :raw for text
+// :lines for text lines
+// [<index>] for nth line
+// :raw[<index>] for nth symbol
+```
+
+* autocomplete of methods/files/others
+
 ### license
 
 LICENSE: MIT

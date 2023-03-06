@@ -1,12 +1,20 @@
 mod interpreter;
 mod values;
 use interpreter::{Interpreter, TextRenderer};
-use std::io::{BufRead, Write};
+use std::io::{BufRead, Write, Stdout};
+use users::{get_user_by_uid, get_current_uid};
 
 fn on_input_line(interpreter: &mut Interpreter, line: String) {
     // it also renders the result
     // using .renderer
     interpreter.run(line);
+}
+
+fn write_prompt(stdout: &mut Stdout) {
+    let current_dir = std::env::current_dir().unwrap();
+    let user = get_user_by_uid(get_current_uid()).unwrap();
+    let user_name = user.name().to_string_lossy();
+    write!(*stdout, "{} {} > ", user_name, current_dir.display()).unwrap();
 }
 
 fn run_loop() {
@@ -18,7 +26,7 @@ fn run_loop() {
     //stdio "dir\n";
     let mut stdout = std::io::stdout();
     loop {
-        write!(stdout, "> ").unwrap();
+        write_prompt(&mut stdout);
         stdout.flush().unwrap();
 
         line.clear();
