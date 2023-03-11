@@ -23,7 +23,7 @@ module.exports = grammar({
       fieldName: $ => seq(':', $.name),
       index: $ => seq($._indexBaseExpression, '[', $._expression, ']'),
       integer: $ => /[0-9]+/,
-      name: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+      name: $ => /[a-zA-Z_\.][a-zA-Z0-9_\.]*/,
       // _argExpression: $ => choice($._fieldExpression, $._expression)
     }
   });

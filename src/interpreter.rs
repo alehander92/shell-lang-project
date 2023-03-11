@@ -112,12 +112,17 @@ fn to_int_like(i: i64, typ: Type) -> Value {
     Value::Int(i, typ)
 }
 
+fn property_method(name: &str) -> Value {
+    Value::PropertyMethod(name.to_string(), simple_type("PropertyMethod"))
+}
+
 fn to_file(internal: std::fs::DirEntry) -> Value {
     let typ = to_object_type(
         "File",
         vec![
             to_field("name", simple_type("Name")),
             to_field("size", simple_type("Size")),
+            to_field("raw", simple_type("PropertyMethod"))
             // to_field("user", simple_type("User")),
             // to_field("group", simple_type("Group"))
         ]);
@@ -134,7 +139,8 @@ fn to_file(internal: std::fs::DirEntry) -> Value {
                 simple_type("Name")),
             to_int_like(
                 metadata.size() as i64,
-                simple_type("Size"))
+                simple_type("Size")),
+            property_method("raw")
             // to_text_like(
             //     metadata.
             //     simple_type("Date"))
@@ -156,15 +162,31 @@ static DIR_STREAM_IMPL: LangStreamImpl = LangStreamImpl {
     generate_next: dir_stream_generate_next
 };
 
+pub fn load_file_variables() -> HashMap<String, Value> {
+    let mut results = HashMap::new();
+    let files = std::fs::read_dir(".").unwrap();
+    for dir_entry_result in files {
+        let dir_entry = dir_entry_result.unwrap();
+        let file_name = dir_entry.file_name().to_str().unwrap().to_string();
+        let file = to_file(dir_entry);
+        results.insert(
+            file_name,
+            file);
+    }
+    results
+}
+
 pub fn initial_env() -> Env {
     let file_type = simple_type("File");
-    Env { values: HashMap::from([
-            (
-                "dir".to_string(),
-                stream_value("dir", file_type)
-            )
-        ])
-    }
+    let mut values = HashMap::from([
+        (
+            "dir".to_string(),
+            stream_value("dir", file_type)
+        )
+    ]);
+    let file_variables = load_file_variables();
+    values.extend(file_variables);
+    Env { values: values }
 }
 
 //----------- 
@@ -193,6 +215,9 @@ impl Renderer for TextRenderer {
             },
             Value::BuiltinFunction(name, _) => {
                 format!("<builtin function {}>", name)
+            },
+            Value::PropertyMethod(name, _) => {
+                format!("<property method {}>", name)
             },
             Value::List { items, typ: _ } => {
                 let items_text = items.iter().map(|item| {
@@ -266,8 +291,8 @@ impl Interpreter {
     }
     
     fn evaluate_node(&mut self, node: Node) -> Value {
-        println!("  node kind: {:?}", node.kind());
-        println!("  node: {:?}", node);
+        // println!("  node kind: {:?}", node.kind());
+        // println!("  node: {:?}", node);
         let res = match node.kind() {
             "source_file" => {
                 self.evaluate_node(node.named_child(0).unwrap())
@@ -279,6 +304,14 @@ impl Interpreter {
                     .to_string()
                 )
             },
+            "fieldExpression" => {
+                let base = self.evaluate_node(node.named_child(0).unwrap());
+                self.evaluate_field(
+                    base,
+                    node.named_child(1).unwrap().
+                        utf8_text(self.source.as_bytes()).unwrap().
+                        to_string())
+            }
             _ => unimplemented!()
         };
 
@@ -287,6 +320,74 @@ impl Interpreter {
                 self.evaluate_stream(res)
             },
             _ => res
+        }
+    }
+
+    fn evaluate_field(&mut self, base: Value, field_name: String) -> Value {
+        // a.rs:raw
+        // if object and if such a field:
+        //    if a property method, call it 
+        //    otherwise if a normal value, return it
+        // otherwise:
+        //   error value
+        if let Value::Object(field_values, typ) = base.clone() {
+            if let Type::Object(name, fields) = typ {
+                for (i, field) in fields.iter().enumerate() {
+                    if field.name == field_name {
+                        return self.evaluate_found_field(
+                            base,
+                            name,
+                            field_values[i].clone());
+                    }
+                }
+                return error_value(format!("not field {} found", field_name));
+            } else {
+                return error_value("tried to access field, but type of base is not an object".to_string());
+            }
+        } else {
+            return error_value("tried to access field, but base is not an object".to_string());
+        }
+    }
+
+    fn evaluate_found_field(&mut self, base: Value, object_name: String, field: Value) -> Value {
+        //    if a property method, call it 
+        //    otherwise if a normal value, return it
+        
+        match field {
+            Value::PropertyMethod(name, typ) => {
+                self.property_impl(object_name, name, base)
+                // let property_impl = PROPERTY_METHOD_IMPLS[object_name][name];
+                // (property_impl)(base)
+            },
+            _ => {
+                field
+            }
+        }
+    }
+
+    fn property_impl(&mut self, object_name: String, field_name: String, base: Value) -> Value {
+        match object_name.as_str() {
+            "File" => {
+                self.file_property_impl(field_name, base)
+            },
+            _ => {
+                error_value(format!("no properties for {}", object_name))
+            }
+        }        
+    }
+
+    fn file_property_impl(&mut self, field_name: String, base: Value) -> Value{
+        match field_name.as_str() {
+            "raw" => {
+                let name = base.get_field("name").expect("expected valid name field")
+                                       .get_string().expect("expected string name field");
+                to_text_like(
+                    std::fs::read_to_string(name).unwrap(),
+                    simple_type("FileContent"))
+            },
+            _ => {
+                error_value(format!("no property named {} for File", field_name))
+            }
         }
     }
 
