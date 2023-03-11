@@ -9,6 +9,8 @@ module.exports = grammar({
         $.fieldExpression,
         $.fieldName,
         $.index,
+        $.call,
+        $._path,
         $.name,
         $.integer),
       _indexBaseExpression: $ => choice(
@@ -18,11 +20,18 @@ module.exports = grammar({
         $.name,
         $.integer),
       // fieldExpression: $ => seq($._expression, choice($.fieldCall, $.fieldName)),
-      fieldCall: $ => seq($._expression, ':', $.name, '(', $._expression, ')'),
-      fieldExpression: $ => seq($._expression, ':', $.name),
+      call: $ => prec(1, seq($.name, ' ', $._expression)),
+      fieldCall: $ => prec(2, seq($._expression, ':', $.name, '(', $._expression, ')')),
+      fieldExpression: $ => prec(2, seq($._expression, ':', $.name)),
       fieldName: $ => seq(':', $.name),
       index: $ => seq($._indexBaseExpression, '[', $._expression, ']'),
+      _path: $ => choice(
+        $.relativePath,
+        $.absolutePath),
+        absolutePath: $ => seq(repeat1(seq('/', $.name))),
+      relativePath: $ => seq($.name, repeat1(seq('/', $.name))),
       integer: $ => /[0-9]+/,
+      
       name: $ => /[a-zA-Z_\.][a-zA-Z0-9_\.]*/,
       // _argExpression: $ => choice($._fieldExpression, $._expression)
     }

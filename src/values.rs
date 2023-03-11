@@ -71,6 +71,14 @@ impl Value {
             None
         }
     }
+
+    pub fn get_name(&self) -> Option<String> {
+        if let Value::Name(name, typ) = self {
+            Some((*name).clone())
+        } else {
+            None
+        }
+    }
 }
 
 impl Type {

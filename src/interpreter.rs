@@ -182,6 +182,11 @@ pub fn initial_env() -> Env {
         (
             "dir".to_string(),
             stream_value("dir", file_type)
+        ),
+        (
+            "cd".to_string(),
+            // TODO proper type
+            Value::BuiltinFunction("cd".to_string(), simple_type("Function")) 
         )
     ]);
     let file_variables = load_file_variables();
@@ -293,6 +298,8 @@ impl Interpreter {
     fn evaluate_node(&mut self, node: Node) -> Value {
         // println!("  node kind: {:?}", node.kind());
         // println!("  node: {:?}", node);
+        // println!("  node tree: {:?}", node.to_sexp());
+        
         let res = match node.kind() {
             "source_file" => {
                 self.evaluate_node(node.named_child(0).unwrap())
@@ -311,6 +318,15 @@ impl Interpreter {
                     node.named_child(1).unwrap().
                         utf8_text(self.source.as_bytes()).unwrap().
                         to_string())
+            },
+            "call" => {
+                let function = self.evaluate_node(node.named_child(0).unwrap());
+                if let Value::BuiltinFunction(name, typ) = function {
+                    // TODO typecheck arg and typ
+                    self.call_impl(name, node.named_child(1).unwrap())
+                } else {
+                    error_value(format!("{} is not a function", self.renderer.render(function, true, false)))
+                }
             }
             _ => unimplemented!()
         };
@@ -361,6 +377,29 @@ impl Interpreter {
             },
             _ => {
                 field
+            }
+        }
+    }
+
+    // might be lazily evaluated, e.g. cd doesn't expect a valid
+    // pre-evaluated arg, but e.g. `..` which it directly passes to system
+    fn call_impl(&mut self, function_name: String, arg: Node) -> Value {
+        match function_name.as_str() {
+            "cd" => {
+                let path = arg.utf8_text(self.source.as_bytes())
+                    .unwrap()
+                    .to_string();
+                let set_dir_result = std::env::set_current_dir(path);
+                if let Ok(_) = set_dir_result {
+                    self.env = initial_env(); // reloading file variables
+                    to_text_like("(moved)".to_string(), simple_type("Move"))
+                } else {
+                    error_value("couldn't change directory".to_string())
+                }
+            },
+            // for others TODO let arg_value = self.evaluate_node(arg);
+            _ => {
+                error_value(format!("no function {}", function_name))
             }
         }
     }
@@ -443,10 +482,10 @@ impl Interpreter {
     fn evaluate_name(&mut self, name: String) -> Value {
         let value_option = self.env.get(&name);
         match value_option {
-            Some(Value::BuiltinFunction(_, _)) => {
-                // TODO
-                unimplemented!();
-            },
+            // Some(Value::BuiltinFunction(_, _)) => {
+            //     // TODO
+            //     unimplemented!();
+            // },
             Some(value) => {
                 value
             },

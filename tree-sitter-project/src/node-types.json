@@ -1,0 +1,318 @@
+[
+  {
+    "type": "absolutePath",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "call",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "absolutePath",
+          "named": true
+        },
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fieldCall",
+          "named": true
+        },
+        {
+          "type": "fieldExpression",
+          "named": true
+        },
+        {
+          "type": "fieldName",
+          "named": true
+        },
+        {
+          "type": "index",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "relativePath",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "fieldCall",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "absolutePath",
+          "named": true
+        },
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fieldCall",
+          "named": true
+        },
+        {
+          "type": "fieldExpression",
+          "named": true
+        },
+        {
+          "type": "fieldName",
+          "named": true
+        },
+        {
+          "type": "index",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "relativePath",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "fieldExpression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "absolutePath",
+          "named": true
+        },
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fieldCall",
+          "named": true
+        },
+        {
+          "type": "fieldExpression",
+          "named": true
+        },
+        {
+          "type": "fieldName",
+          "named": true
+        },
+        {
+          "type": "index",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "relativePath",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "fieldName",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "index",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "absolutePath",
+          "named": true
+        },
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fieldCall",
+          "named": true
+        },
+        {
+          "type": "fieldExpression",
+          "named": true
+        },
+        {
+          "type": "fieldName",
+          "named": true
+        },
+        {
+          "type": "index",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "relativePath",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "relativePath",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "absolutePath",
+          "named": true
+        },
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fieldCall",
+          "named": true
+        },
+        {
+          "type": "fieldExpression",
+          "named": true
+        },
+        {
+          "type": "fieldName",
+          "named": true
+        },
+        {
+          "type": "index",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "relativePath",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": " ",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": "/",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "[",
+    "named": false
+  },
+  {
+    "type": "]",
+    "named": false
+  },
+  {
+    "type": "integer",
+    "named": true
+  },
+  {
+    "type": "name",
+    "named": true
+  }
+]
